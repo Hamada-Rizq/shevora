@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { ShoppingBag, Star, ChevronRight, ChevronLeft, Share2, Heart } from 'lucide-react'
@@ -18,9 +18,11 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<PublicProduct | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
   const [related, setRelated] = useState<PublicProduct[]>([])
+  const [images, setImages] = useState<{ id: string; url: string; is_primary: boolean }[]>([])
   const [activeImg, setActiveImg] = useState(0)
   const [qty, setQty] = useState(1)
   const [loading, setLoading] = useState(true)
+  const touchStartX = useRef<number>(0)
   const addItem = useCartStore((s) => s.addItem)
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export default function ProductDetailPage() {
       if (!prod) { setLoading(false); return }
       setProduct(prod)
 
-      const [{ data: revs }, { data: rel }] = await Promise.all([
+      const [{ data: revs }, { data: rel }, { data: imgs }] = await Promise.all([
         supabase
           .from('reviews')
           .select('*')
@@ -49,10 +51,17 @@ export default function ProductDetailPage() {
           .eq('category_id', prod.category_id)
           .neq('id', prod.id)
           .limit(4),
+        supabase
+          .from('product_images')
+          .select('id, url, is_primary')
+          .eq('product_id', prod.id)
+          .order('is_primary', { ascending: false }),
       ])
 
       setReviews(revs || [])
       setRelated(rel || [])
+      const allImgs = imgs && imgs.length > 0 ? imgs : (prod.primary_image ? [{ id: 'primary', url: prod.primary_image, is_primary: true }] : [])
+      setImages(allImgs)
       setLoading(false)
     }
     load()
@@ -80,7 +89,6 @@ export default function ProductDetailPage() {
     )
   }
 
-  const images = product.images || []
   const effectivePrice = product.has_price_drop && product.new_price ? product.new_price : product.selling_price
   const badge = getOfferBadgeLabel(product.offer_type, product.offer_value, product.offer_label)
   const discount = product.has_price_drop && product.old_price && product.new_price
@@ -110,7 +118,17 @@ export default function ProductDetailPage() {
 
           {/* Images */}
           <div className="space-y-4">
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-primary-50">
+            <div
+              className="relative aspect-square rounded-2xl overflow-hidden bg-primary-50"
+              onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX }}
+              onTouchEnd={(e) => {
+                const diff = touchStartX.current - e.changedTouches[0].clientX
+                if (Math.abs(diff) > 50) {
+                  if (diff > 0) setActiveImg((i) => Math.min(images.length - 1, i + 1))
+                  else setActiveImg((i) => Math.max(0, i - 1))
+                }
+              }}
+            >
               {images[activeImg]?.url || product.primary_image ? (
                 <Image
                   src={images[activeImg]?.url || product.primary_image || ''}
@@ -140,6 +158,14 @@ export default function ProductDetailPage() {
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full shadow">
                     <ChevronRight className="w-4 h-4" />
                   </button>
+                  {/* Dots indicator */}
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    {images.map((_, i) => (
+                      <button key={i} onClick={() => setActiveImg(i)}
+                        className={`w-2 h-2 rounded-full transition-all ${i === activeImg ? 'bg-primary-500 w-4' : 'bg-white/70'}`}
+                      />
+                    ))}
+                  </div>
                 </>
               )}
             </div>
@@ -148,7 +174,7 @@ export default function ProductDetailPage() {
                 {images.map((img, i) => (
                   <button key={img.id} onClick={() => setActiveImg(i)}
                     className={`relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all ${i === activeImg ? 'border-primary-500' : 'border-transparent'}`}>
-                    <Image src={img.url} alt={img.alt_text || ''} fill className="object-cover" />
+                    <Image src={img.url} alt="" fill className="object-cover" />
                   </button>
                 ))}
               </div>

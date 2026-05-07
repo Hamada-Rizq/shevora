@@ -14,6 +14,7 @@ export default function CheckoutPage() {
   const [form, setForm] = useState<CheckoutForm>({ name: '', phone: '', address: '' })
   const [errors, setErrors] = useState<Partial<CheckoutForm>>({})
   const [submitted, setSubmitted] = useState(false)
+  const [whatsappUrl, setWhatsappUrl] = useState('')
 
   const validate = (): boolean => {
     const e: Partial<CheckoutForm> = {}
@@ -31,7 +32,8 @@ export default function CheckoutPage() {
     if (!validate()) return
 
     const orderItems = items.map((i) => ({ id: i.id, name: i.name, qty: i.quantity, price: i.price }))
-    const whatsappUrl = buildWhatsAppMessage(form, items, cartTotal)
+    const url = buildWhatsAppMessage(form, items, cartTotal)
+    setWhatsappUrl(url)
 
     // Save order to Supabase (service client bypasses RLS)
     await fetch('/api/orders', {
@@ -51,7 +53,7 @@ export default function CheckoutPage() {
     // Clear cart and redirect to WhatsApp
     clearCart()
     setSubmitted(true)
-    window.open(whatsappUrl, '_blank')
+    window.open(url, '_blank')
   }
 
   if (items.length === 0 && !submitted) {
@@ -77,7 +79,7 @@ export default function CheckoutPage() {
           <p className="text-charcoal-600 leading-relaxed">
             سيتم فتح واتساب تلقائياً لتأكيد طلبك. إذا لم يفتح،{' '}
             <a
-              href={buildWhatsAppMessage(form, [], 0)}
+              href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-green-600 font-semibold underline"
