@@ -74,10 +74,17 @@ export default function EditProductPage() {
   }
 
   const deleteImage = async (imgId: string) => {
-    const supabase = createClient()
-    await supabase.from('product_images').delete().eq('id', imgId)
-    setImages((prev) => prev.filter((i) => i.id !== imgId))
-    toast.success('تم حذف الصورة')
+    const res = await fetch('/api/admin/upload', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: imgId }),
+    })
+    if (res.ok) {
+      setImages((prev) => prev.filter((i) => i.id !== imgId))
+      toast.success('تم حذف الصورة')
+    } else {
+      toast.error('فشل حذف الصورة')
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
