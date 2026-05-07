@@ -103,21 +103,18 @@ export default function EditProductPage() {
 
     if (!res.ok) { toast.error('فشل التحديث'); setSaving(false); return }
 
-    // Upload new images
+    // Upload new images via server route (uses service role key)
     if (newImages.length > 0) {
-      const supabase = createClient()
       for (let i = 0; i < newImages.length; i++) {
         const file = newImages[i]
-        const ext = file.name.split('.').pop()
-        const path = `products/${id}/${Date.now()}-${i}.${ext}`
-        const { data: uploaded } = await supabase.storage.from('product-images').upload(path, file)
-        if (uploaded) {
-          const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(path)
-          await fetch('/api/admin/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ product_id: id, url: publicUrl, is_primary: images.length === 0 && i === 0 }),
-          })
+        const fd = new FormData()
+        fd.append('file', file)
+        fd.append('product_id', id)
+        fd.append('is_primary', String(images.length === 0 && i === 0))
+        const uploadRes = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json()
+          toast.error(`فشل رفع الصورة: ${err.error}`)
         }
       }
     }
