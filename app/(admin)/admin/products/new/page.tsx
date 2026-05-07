@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { Save, Upload, X, ArrowLeft, ImagePlus } from 'lucide-react'
 import { Category } from '@/lib/types'
-import { createClient } from '@/lib/supabase'
 
 const OFFER_TYPES = [
   { value: '', label: 'بدون عرض' },
@@ -83,8 +82,6 @@ export default function NewProductPage() {
     if (!form.name.trim()) { toast.error('اسم المنتج مطلوب'); return }
     setSaving(true)
 
-    const supabase = createClient()
-
     // Create product
     const res = await fetch('/api/admin/products', {
       method: 'POST',
@@ -109,23 +106,35 @@ export default function NewProductPage() {
       return
     }
 
-    const { data: newProduct } = await res.json()
+    const json = await res.json()
+    const newProduct = json.data
 
-    // Upload images
-    if (images.length > 0 && newProduct?.id) {
+    if (!newProduct?.id) {
+      toast.error('فشل الحصول على معرف المنتج')
+      setSaving(false)
+      return
+    }
+
+    // Upload images via server route (uses service role key)
+    if (images.length > 0) {
+      let uploadFailed = false
       for (let i = 0; i < images.length; i++) {
-        const file = images[i]
-        const ext = file.name.split('.').pop()
-        const path = `products/${newProduct.id}/${Date.now()}-${i}.${ext}`
-        const { data: uploaded } = await supabase.storage.from('product-images').upload(path, file)
-        if (uploaded) {
-          const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(path)
-          await fetch('/api/admin/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ product_id: newProduct.id, url: publicUrl, is_primary: i === 0 }),
-          })
+        const fd = new FormData()
+        fd.append('file', images[i])
+        fd.append('product_id', newProduct.id)
+        fd.append('is_primary', String(i === 0))
+        const uploadRes = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json().catch(() => ({}))
+          toast.error(`فشل رفع الصورة ${i + 1}: ${err.error || 'خطأ غير معروف'}`)
+          uploadFailed = true
         }
+      }
+      if (uploadFailed) {
+        toast('تم حفظ المنتج لكن بعض الصور لم ترفع — يمكنك إضافتها من صفحة التعديل', { icon: '⚠️' })
+        router.push(`/admin/products/${newProduct.id}`)
+        setSaving(false)
+        return
       }
     }
 
