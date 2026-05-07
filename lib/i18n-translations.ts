@@ -144,6 +144,7 @@ const translations = {
     naturalCare: 'عناية طبيعية',
     freeShipping: 'شحن مجاني',
     qualityGuarantee: 'ضمان الجودة',
+    authentic100: 'منتجات أصلية 100%',
   },
   en: {
     // Nav
@@ -290,6 +291,7 @@ const translations = {
     naturalCare: 'Natural Care',
     freeShipping: 'Free Shipping',
     qualityGuarantee: 'Quality Guarantee',
+    authentic100: '100% Authentic Products',
   },
 } as const
 

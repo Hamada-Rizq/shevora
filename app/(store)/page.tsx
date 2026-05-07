@@ -94,6 +94,7 @@ export default async function HomePage() {
               </div>
               {[
                 { label: t('naturalCare'), icon: '🌿', pos: '-top-4 -right-4' },
+                { label: t('authentic100'), icon: '✨', pos: '-bottom-4 -right-8' },
                 { label: t('qualityGuarantee'), icon: '✅', pos: 'top-12 -left-8' },
               ].map((badge) => (
                 <div key={badge.label}
