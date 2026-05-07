@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     locale: 'ar_EG',
     siteName: 'Shevora Beauty & Glow',
   },
-  icons: { icon: '/favicon.ico' },
+  icons: { icon: '/logo.png' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
