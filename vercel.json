@@ -1,0 +1,12 @@
+{
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "regions": ["fra1"],
+  "env": {
+    "NEXT_PUBLIC_WHATSAPP_NUMBER": "201550320776",
+    "NEXT_PUBLIC_INSTAGRAM_URL": "https://www.instagram.com/cosmeticano1",
+    "NEXT_PUBLIC_TIKTOK_URL": "https://www.tiktok.com/@cosmeticano1",
+    "NEXT_PUBLIC_BRAND_NAME": "Shevora"
+  }
+}

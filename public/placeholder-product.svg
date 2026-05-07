@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#FCE4EC"/>
+  <circle cx="200" cy="160" r="70" fill="#F4A7B5" opacity="0.5"/>
+  <text x="200" y="175" font-size="60" text-anchor="middle">🧴</text>
+  <text x="200" y="260" font-family="Georgia" font-size="18" fill="#2D3748" text-anchor="middle" opacity="0.5">Shevora</text>
+</svg>

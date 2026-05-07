@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-inter: 'Inter', system-ui, sans-serif;
+
+  --soft-rose:   #F5B8C8;
+  --warm-nude:   #E8C7B3;
+  --offwhite:    #FFF7F4;
+  --terracotta:  #D97A6C;
+  --mauve:       #C2A1B8;
+  --dark-cocoa:  #3C2A33;
+  --taupe:       #8B6F76;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-inter);
+  background-color: var(--offwhite);
+  color: var(--dark-cocoa);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display { font-family: var(--font-playfair); }
+
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: #FCDDE7; }
+::-webkit-scrollbar-thumb  { background: #D97A6C; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #C45E50; }
+
+:focus-visible { outline: 2px solid #D97A6C; outline-offset: 2px; }
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full
+           text-white font-semibold text-sm
+           active:scale-95 transition-all duration-200 cursor-pointer select-none;
+    background-color: #D97A6C;
+    box-shadow: 0 4px 20px rgba(217,122,108,0.25);
+  }
+  .btn-primary:hover { background-color: #C45E50; }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full
+           border-2 font-semibold text-sm
+           active:scale-95 transition-all duration-200 cursor-pointer select-none;
+    border-color: #E8C7B3;
+    color: #8B6F76;
+  }
+  .btn-secondary:hover {
+    border-color: #F5B8C8;
+    color: #E37490;
+    background-color: #FEF0F5;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full
+           font-medium text-sm active:scale-95 transition-all duration-200 cursor-pointer select-none;
+    color: #3C2A33;
+  }
+  .btn-ghost:hover { background-color: #FEF0F5; }
+
+  .card {
+    @apply bg-white rounded-2xl overflow-hidden;
+    box-shadow: 0 2px 16px rgba(60,42,51,0.06);
+  }
+  .card-hover {
+    @apply card hover:-translate-y-1 transition-all duration-300;
+  }
+  .card-hover:hover { box-shadow: 0 8px 32px rgba(245,184,200,0.28); }
+
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border bg-white
+           focus:outline-none focus:border-transparent transition-all duration-200;
+    border-color: #E8C7B3;
+    color: #3C2A33;
+  }
+  .input::placeholder { color: #A8888F; }
+  .input:focus { box-shadow: 0 0 0 2px #E08B7F40; }
+
+  .label {
+    @apply block text-sm font-semibold mb-1.5;
+    color: #3C2A33;
+  }
+
+  .badge-offer {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm;
+    background-color: #D97A6C;
+  }
+
+  .badge-sold-out {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-white;
+    background-color: #3C2A33;
+  }
+
+  .section-title {
+    @apply font-display text-3xl md:text-4xl font-bold leading-tight;
+    color: #3C2A33;
+  }
+
+  .admin-card {
+    @apply bg-white rounded-2xl p-6;
+    box-shadow: 0 2px 16px rgba(60,42,51,0.06);
+  }
+}
+
+@keyframes wa-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+.wa-float { animation: wa-bounce 2.5s ease-in-out infinite; }
+
+.page-enter { animation: fadeIn 0.3s ease-out; }
