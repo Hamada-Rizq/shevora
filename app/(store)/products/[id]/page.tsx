@@ -211,7 +211,7 @@ export default function ProductDetailPage() {
 
             {/* Description */}
             {product.description && (
-              <p className="text-charcoal-600/80 leading-relaxed">{product.description}</p>
+              <p className="text-charcoal-600/80 leading-relaxed whitespace-pre-line">{product.description}</p>
             )}
 
             {/* Stock */}
