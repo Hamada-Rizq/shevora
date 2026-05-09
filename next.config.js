@@ -1,5 +1,9 @@
+const path = require('path')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Fix: set project root explicitly so Vercel doesn't get confused by parent lockfiles
+  outputFileTracingRoot: path.join(__dirname),
   images: {
     remotePatterns: [
       {
@@ -11,7 +15,7 @@ const nextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000', 'zippy-dasik-e06fc0.netlify.app'],
+      allowedOrigins: ['localhost:3000', 'shevora-app.vercel.app'],
     },
   },
 }
