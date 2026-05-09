@@ -187,7 +187,7 @@ export default function ProductDetailPage() {
             {product.category_name && (
               <p className="text-xs text-primary-400 font-semibold uppercase tracking-widest">{product.category_name}</p>
             )}
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-charcoal-800 leading-tight">
+            <h1 dir="auto" className="font-display text-3xl md:text-4xl font-bold text-charcoal-800 leading-tight">
               {product.name}
             </h1>
 
@@ -233,11 +233,17 @@ export default function ProductDetailPage() {
                       </button>
                       {openSection === section.key && (
                         <div className="px-5 pb-5 text-charcoal-600/80 text-sm animate-fade-in space-y-1">
-                          {section.content!.split('\n').map((line, i) =>
-                            line.trim() === ''
-                              ? <div key={i} className="h-2" />
-                              : <p key={i} dir="auto" className="leading-relaxed">{line}</p>
-                          )}
+                          {section.content!.split('\n').map((line, i) => {
+                            if (line.trim() === '') return <div key={i} className="h-2" />
+                            const firstStrong = line.match(/[A-Za-z؀-ۿ]/)
+                            const isAr = firstStrong ? /[؀-ۿ]/.test(firstStrong[0]) : true
+                            return (
+                              <p key={i} dir={isAr ? 'rtl' : 'ltr'}
+                                className={`leading-relaxed ${isAr ? 'text-right' : 'text-left'}`}>
+                                {line}
+                              </p>
+                            )
+                          })}
                         </div>
                       )}
                     </div>
