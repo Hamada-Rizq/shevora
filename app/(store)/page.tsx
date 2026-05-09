@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { createClient } from '@/lib/supabase-server'
 import { getServerT } from '@/lib/i18n-server'
 import ProductCard from '@/components/store/ProductCard'
+import CollectionsSection from '@/components/store/CollectionsSection'
 import { PublicProduct } from '@/lib/types'
 import { ArrowLeft, Sparkles, TrendingUp, Gift } from 'lucide-react'
 
@@ -128,6 +129,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── COLLECTIONS ──────────────────────────────── */}
+      <CollectionsSection />
 
       {/* ── HOT OFFERS ───────────────────────────────── */}
       {hotOffers.length > 0 && (
