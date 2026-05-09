@@ -26,9 +26,25 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const body = await req.json()
   const supabase = createServiceClient()
 
+  // Only pass known inventory columns to avoid Supabase rejecting unknown keys
+  const {
+    name, description, ingredients, how_to_use, sku, category_id,
+    cost_price, wholesale_price, selling_price, stock_quantity,
+    has_price_drop, old_price, new_price, offer_type, offer_value, offer_label,
+    is_published, is_featured, tags,
+  } = body
+
   const { data, error } = await supabase
     .from('inventory')
-    .update(body)
+    .update({
+      name, description: description || null,
+      ingredients: ingredients || null,
+      how_to_use: how_to_use || null,
+      sku: sku || null, category_id: category_id || null,
+      cost_price, wholesale_price, selling_price, stock_quantity,
+      has_price_drop, old_price, new_price, offer_type, offer_value, offer_label,
+      is_published, is_featured, tags,
+    })
     .eq('id', id)
     .select()
     .single()

@@ -232,7 +232,7 @@ export default function ProductDetailPage() {
                           : <Plus className="w-5 h-5 text-primary-400 flex-shrink-0" />}
                       </button>
                       {openSection === section.key && (
-                        <div className="px-5 pb-5 text-charcoal-600/80 leading-relaxed whitespace-pre-line text-sm animate-fade-in">
+                        <div dir="auto" className="px-5 pb-5 text-charcoal-600/80 leading-relaxed whitespace-pre-line text-sm animate-fade-in">
                           {section.content}
                         </div>
                       )}

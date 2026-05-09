@@ -45,7 +45,7 @@ export async function POST(req: Request) {
   const supabase = createServiceClient()
 
   const {
-    name, description, sku, category_id,
+    name, description, ingredients, how_to_use, sku, category_id,
     cost_price, wholesale_price, selling_price, stock_quantity,
     has_price_drop, old_price, new_price, offer_type, offer_value, offer_label,
     is_published, is_featured, tags,
@@ -60,6 +60,8 @@ export async function POST(req: Request) {
     .insert({
       name: name.trim(),
       description: description || null,
+      ingredients: ingredients || null,
+      how_to_use: how_to_use || null,
       sku: sku || null,
       category_id: category_id || null,
       cost_price: cost_price || 0,

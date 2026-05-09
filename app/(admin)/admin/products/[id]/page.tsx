@@ -171,18 +171,18 @@ export default function EditProductPage() {
             </div>
             <div className="md:col-span-2">
               <label className="label">الوصف</label>
-              <textarea value={form.description} onChange={(e) => set('description', e.target.value)} rows={3} className="input resize-none" />
+              <textarea dir="auto" value={form.description} onChange={(e) => set('description', e.target.value)} rows={3} className="input resize-none" />
             </div>
 
             <div className="md:col-span-2">
               <label className="label">المكونات (اختياري)</label>
-              <textarea value={form.ingredients} onChange={(e) => set('ingredients', e.target.value)}
+              <textarea dir="auto" value={form.ingredients} onChange={(e) => set('ingredients', e.target.value)}
                 rows={4} placeholder="مثال:&#10;- ماء&#10;- حمض الهيالورونيك&#10;- فيتامين C" className="input resize-none" />
             </div>
 
             <div className="md:col-span-2">
               <label className="label">طريقة الاستخدام (اختياري)</label>
-              <textarea value={form.how_to_use} onChange={(e) => set('how_to_use', e.target.value)}
+              <textarea dir="auto" value={form.how_to_use} onChange={(e) => set('how_to_use', e.target.value)}
                 rows={4} placeholder="مثال:&#10;1. نظف البشرة جيداً&#10;2. ضع كمية صغيرة&#10;3. دلّك بحركات دائرية" className="input resize-none" />
             </div>
           </div>
