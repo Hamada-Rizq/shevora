@@ -45,6 +45,8 @@ export interface Inventory {
   name: string
   slug?: string
   description?: string
+  ingredients?: string
+  how_to_use?: string
   sku?: string
   barcode?: string
   category_id?: string
@@ -151,6 +153,8 @@ export interface PublicProduct {
   name: string
   slug: string
   description?: string
+  ingredients?: string
+  how_to_use?: string
   selling_price: number
   has_price_drop: boolean
   old_price?: number

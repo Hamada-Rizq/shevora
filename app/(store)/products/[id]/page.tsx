@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
-import { ShoppingBag, Star, ChevronRight, ChevronLeft, Share2, Heart } from 'lucide-react'
+import { ShoppingBag, Star, ChevronRight, ChevronLeft, Share2, Heart, Plus, Minus } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase'
 import { PublicProduct, Review } from '@/lib/types'
@@ -22,6 +22,7 @@ export default function ProductDetailPage() {
   const [activeImg, setActiveImg] = useState(0)
   const [qty, setQty] = useState(1)
   const [loading, setLoading] = useState(true)
+  const [openSection, setOpenSection] = useState<string | null>('description')
   const touchStartX = useRef<number>(0)
   const addItem = useCartStore((s) => s.addItem)
 
@@ -209,9 +210,35 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            {/* Description */}
-            {product.description && (
-              <p className="text-charcoal-600/80 leading-relaxed whitespace-pre-line">{product.description}</p>
+            {/* Info Accordion */}
+            {(product.description || product.ingredients || product.how_to_use) && (
+              <div className="border border-nude-200 rounded-2xl overflow-hidden divide-y divide-nude-200">
+                {[
+                  { key: 'description', label: 'الوصف', content: product.description },
+                  { key: 'ingredients', label: 'المكونات', content: product.ingredients },
+                  { key: 'how_to_use', label: 'طريقة الاستخدام', content: product.how_to_use },
+                ]
+                  .filter((s) => !!s.content)
+                  .map((section) => (
+                    <div key={section.key}>
+                      <button
+                        type="button"
+                        onClick={() => setOpenSection(openSection === section.key ? null : section.key)}
+                        className="w-full flex items-center justify-between px-5 py-4 text-right hover:bg-primary-50/50 transition-colors"
+                      >
+                        <span className="font-bold text-charcoal-800 text-base">{section.label}</span>
+                        {openSection === section.key
+                          ? <Minus className="w-5 h-5 text-primary-400 flex-shrink-0" />
+                          : <Plus className="w-5 h-5 text-primary-400 flex-shrink-0" />}
+                      </button>
+                      {openSection === section.key && (
+                        <div className="px-5 pb-5 text-charcoal-600/80 leading-relaxed whitespace-pre-line text-sm animate-fade-in">
+                          {section.content}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
             )}
 
             {/* Stock */}

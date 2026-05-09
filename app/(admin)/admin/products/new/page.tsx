@@ -24,7 +24,7 @@ export default function NewProductPage() {
   const [inventorySuggestions, setInventorySuggestions] = useState<any[]>([])
 
   const [form, setForm] = useState({
-    name: '', description: '', sku: '', category_id: '',
+    name: '', description: '', ingredients: '', how_to_use: '', sku: '', category_id: '',
     cost_price: '', wholesale_price: '', selling_price: '',
     stock_quantity: '0', has_price_drop: false,
     old_price: '', new_price: '', offer_type: '', offer_value: '', offer_label: '',
@@ -217,6 +217,18 @@ export default function NewProductPage() {
               <label className="label">الوصف</label>
               <textarea value={form.description} onChange={(e) => set('description', e.target.value)}
                 rows={3} placeholder="وصف المنتج..." className="input resize-none" />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="label">المكونات (اختياري)</label>
+              <textarea value={form.ingredients} onChange={(e) => set('ingredients', e.target.value)}
+                rows={4} placeholder="مثال:&#10;- ماء&#10;- حمض الهيالورونيك&#10;- فيتامين C" className="input resize-none" />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="label">طريقة الاستخدام (اختياري)</label>
+              <textarea value={form.how_to_use} onChange={(e) => set('how_to_use', e.target.value)}
+                rows={4} placeholder="مثال:&#10;1. نظف البشرة جيداً&#10;2. ضع كمية صغيرة&#10;3. دلّك بحركات دائرية" className="input resize-none" />
             </div>
 
             <div className="md:col-span-2">
