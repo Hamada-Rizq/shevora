@@ -54,7 +54,8 @@ export default function Navbar() {
   useEffect(() => {
     fetch('/api/categories')
       .then((r) => r.json())
-      .then(({ data }) => setCategories(data || []))
+      // Fix 1: exclude slug='all' so it doesn't duplicate the manual "All" entry
+      .then(({ data }) => setCategories((data || []).filter((c: Category) => c.slug !== 'all')))
   }, [])
 
   const getCatName = (cat: Category) => (isAr ? cat.name_ar || cat.name : cat.name_en || cat.name)
@@ -100,26 +101,18 @@ export default function Navbar() {
               </div>
             </Link>
 
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-1">
+            {/* Desktop Nav — Fix 2: scrollable, Fix 3: no duplicate Products/All */}
+            <nav className="hidden md:flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 mx-4 max-w-[700px]">
               {/* Home */}
               <Link
                 href="/"
-                className="px-4 py-2 text-sm font-medium text-taupe-500 hover:text-primary-400 transition-colors rounded-lg hover:bg-primary-50"
+                className="px-3 py-2 text-sm font-medium text-taupe-500 hover:text-primary-400 transition-colors rounded-lg hover:bg-primary-50 whitespace-nowrap shrink-0"
               >
                 {t('home')}
               </Link>
 
-              {/* All Products with mega menu */}
-              <Link
-                href="/products"
-                className="px-4 py-2 text-sm font-medium text-taupe-500 hover:text-primary-400 transition-colors rounded-lg hover:bg-primary-50"
-              >
-                {t('products')}
-              </Link>
-
-              {/* Dynamic category mega menu items */}
-              {categories.map((cat) => (
+              {/* Dynamic category mega menu items (Fix 3: skip slug=all, hot-offers, bundles handled below) */}
+              {categories.filter((c) => !['all', 'hot-offers', 'bundles'].includes(c.slug)).map((cat) => (
                 <div
                   key={cat.id}
                   className="relative"
@@ -245,14 +238,15 @@ export default function Navbar() {
           <div className="md:hidden bg-[#FFF7F4] border-t border-nude-200 max-h-[80vh] overflow-y-auto">
             <nav className="px-4 py-3 space-y-1">
 
-              {/* Home + All products */}
+              {/* Home */}
               <Link href="/" className="block px-4 py-3 rounded-xl text-cocoa-800 hover:bg-primary-50 font-medium transition-all"
                 onClick={() => setMobileOpen(false)}>{t('home')}</Link>
+              {/* All Products (Fix 3: single entry, not duplicated) */}
               <Link href="/products" className="block px-4 py-3 rounded-xl text-cocoa-800 hover:bg-primary-50 font-medium transition-all"
-                onClick={() => setMobileOpen(false)}>{t('allProducts')}</Link>
+                onClick={() => setMobileOpen(false)}>{isAr ? '🌸 جميع المنتجات' : '🌸 All Products'}</Link>
 
-              {/* Dynamic categories with accordion */}
-              {categories.map((cat) => (
+              {/* Dynamic categories (Fix 3: skip 'all') */}
+              {categories.filter((c) => c.slug !== 'all').map((cat) => (
                 <div key={cat.id}>
                   <div className="flex items-center justify-between">
                     <Link

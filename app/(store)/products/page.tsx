@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Search, LayoutGrid, List, ChevronDown, X, Menu, SlidersHorizontal } from 'lucide-react'
 import ProductCard from '@/components/store/ProductCard'
 import { PublicProduct, Category } from '@/lib/types'
@@ -26,19 +27,37 @@ const SORT_OPTIONS = [
 
 type ViewMode = 'grid' | 'list'
 
+// Wrap in Suspense because useSearchParams() requires it in Next.js App Router
 export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-cream-100 flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin" /></div>}>
+      <ProductsContent />
+    </Suspense>
+  )
+}
+
+function ProductsContent() {
   const lang = useLanguageStore((s) => s.lang)
   const isAr = lang === 'ar'
+  const searchParams = useSearchParams()
+  const router = useRouter()
 
   const [products, setProducts] = useState<PublicProduct[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [activeCategory, setActiveCategory] = useState('all')
+  // Fix 4: read initial category from URL param (so navbar links work)
+  const [activeCategory, setActiveCategory] = useState(searchParams.get('cat') || 'all')
   const [sort, setSort] = useState('date-new')
   const [view, setView] = useState<ViewMode>('grid')
   const [catMenuOpen, setCatMenuOpen] = useState(false)
   const [sortOpen, setSortOpen] = useState(false)
+
+  // Sync URL → state when URL changes (e.g. user clicks navbar link)
+  useEffect(() => {
+    const cat = searchParams.get('cat') || 'all'
+    setActiveCategory(cat)
+  }, [searchParams])
 
   useEffect(() => {
     Promise.all([
@@ -46,10 +65,20 @@ export default function ProductsPage() {
       fetch('/api/categories').then((r) => r.json()),
     ]).then(([{ data: prods }, { flat }]) => {
       setProducts(prods || [])
-      setCategories((flat || []).filter((c: Category) => !c.parent_id))
+      // Fix 1: exclude slug='all' from DB categories (we add it manually)
+      setCategories((flat || []).filter((c: Category) => !c.parent_id && c.slug !== 'all'))
       setLoading(false)
     })
   }, [])
+
+  // Fix 4: when user picks a category pill, also update URL
+  const pickCategory = (slug: string) => {
+    setActiveCategory(slug)
+    const params = new URLSearchParams(searchParams.toString())
+    if (slug === 'all') params.delete('cat')
+    else params.set('cat', slug)
+    router.replace(`/products?${params.toString()}`, { scroll: false })
+  }
 
   const displayed = useMemo(() => {
     let result = [...products]
@@ -97,6 +126,7 @@ export default function ProductsPage() {
     return result
   }, [products, activeCategory, search, sort, isAr])
 
+  // Fix 1: "All" added once manually, DB categories already exclude slug='all'
   const allCats = [
     { id: 'all', slug: 'all', name: isAr ? 'الكل' : 'All', name_ar: 'الكل', name_en: 'All', sort_order: -1, is_active: true, created_at: '', updated_at: '' } as Category,
     ...categories,
@@ -123,8 +153,7 @@ export default function ProductsPage() {
 
         {/* ── Toolbar ── */}
         <div className="flex flex-col sm:flex-row gap-3 mb-5">
-
-          {/* Categories menu icon button */}
+          {/* Categories menu icon */}
           <button
             onClick={() => setCatMenuOpen((o) => !o)}
             className={cn(
@@ -140,12 +169,7 @@ export default function ProductsPage() {
 
           {/* Search */}
           <div className="relative flex-1">
-            <Search
-              className={cn(
-                'absolute top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400',
-                isAr ? 'right-3' : 'left-3'
-              )}
-            />
+            <Search className={cn('absolute top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400', isAr ? 'right-3' : 'left-3')} />
             <input
               type="text"
               value={search}
@@ -154,25 +178,20 @@ export default function ProductsPage() {
               className={cn('input w-full', isAr ? 'pr-10 pl-8' : 'pl-10 pr-8')}
             />
             {search && (
-              <button
-                onClick={() => setSearch('')}
-                className={cn('absolute top-1/2 -translate-y-1/2', isAr ? 'left-3' : 'right-3')}
-              >
+              <button onClick={() => setSearch('')} className={cn('absolute top-1/2 -translate-y-1/2', isAr ? 'left-3' : 'right-3')}>
                 <X className="w-4 h-4 text-charcoal-400 hover:text-charcoal-700" />
               </button>
             )}
           </div>
 
-          {/* Sort dropdown */}
+          {/* Sort */}
           <div className="relative">
             <button
               onClick={() => setSortOpen((o) => !o)}
               className="flex items-center gap-2 px-4 py-3 bg-white border border-primary-200 rounded-xl text-sm text-charcoal-700 hover:border-primary-400 transition-all min-w-[180px]"
             >
               <SlidersHorizontal className="w-4 h-4 text-primary-400 shrink-0" />
-              <span className="flex-1 text-start truncate">
-                {isAr ? activeSortLabel?.ar : activeSortLabel?.en}
-              </span>
+              <span className="flex-1 text-start truncate">{isAr ? activeSortLabel?.ar : activeSortLabel?.en}</span>
               <ChevronDown className={cn('w-4 h-4 text-primary-400 transition-transform', sortOpen && 'rotate-180')} />
             </button>
             {sortOpen && (
@@ -181,10 +200,7 @@ export default function ProductsPage() {
                   <button
                     key={opt.value}
                     onClick={() => { setSort(opt.value); setSortOpen(false) }}
-                    className={cn(
-                      'w-full text-start px-4 py-2.5 text-sm transition-colors hover:bg-primary-50',
-                      sort === opt.value ? 'text-primary-600 font-semibold bg-primary-50' : 'text-charcoal-700'
-                    )}
+                    className={cn('w-full text-start px-4 py-2.5 text-sm transition-colors hover:bg-primary-50', sort === opt.value ? 'text-primary-600 font-semibold bg-primary-50' : 'text-charcoal-700')}
                   >
                     {isAr ? opt.ar : opt.en}
                   </button>
@@ -195,18 +211,12 @@ export default function ProductsPage() {
 
           {/* View toggle */}
           <div className="flex items-center border border-primary-200 rounded-xl overflow-hidden bg-white shrink-0">
-            <button
-              onClick={() => setView('grid')}
-              title={isAr ? 'عرض شبكي' : 'Grid View'}
-              className={cn('p-3 transition-colors', view === 'grid' ? 'bg-primary-500 text-white' : 'text-charcoal-500 hover:bg-primary-50')}
-            >
+            <button onClick={() => setView('grid')} title={isAr ? 'عرض شبكي' : 'Grid View'}
+              className={cn('p-3 transition-colors', view === 'grid' ? 'bg-primary-500 text-white' : 'text-charcoal-500 hover:bg-primary-50')}>
               <LayoutGrid className="w-4 h-4" />
             </button>
-            <button
-              onClick={() => setView('list')}
-              title={isAr ? 'عرض قائمة' : 'List View'}
-              className={cn('p-3 transition-colors', view === 'list' ? 'bg-primary-500 text-white' : 'text-charcoal-500 hover:bg-primary-50')}
-            >
+            <button onClick={() => setView('list')} title={isAr ? 'عرض قائمة' : 'List View'}
+              className={cn('p-3 transition-colors', view === 'list' ? 'bg-primary-500 text-white' : 'text-charcoal-500 hover:bg-primary-50')}>
               <List className="w-4 h-4" />
             </button>
           </div>
@@ -217,22 +227,13 @@ export default function ProductsPage() {
           <div className="bg-white rounded-2xl border border-primary-100 shadow-pink p-5 mb-5 animate-fade-in">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-charcoal-800">{isAr ? 'التصنيفات' : 'Categories'}</h3>
-              <button onClick={() => setCatMenuOpen(false)}>
-                <X className="w-4 h-4 text-charcoal-400 hover:text-charcoal-700" />
-              </button>
+              <button onClick={() => setCatMenuOpen(false)}><X className="w-4 h-4 text-charcoal-400 hover:text-charcoal-700" /></button>
             </div>
             <div className="flex flex-wrap gap-2">
               {allCats.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => { setActiveCategory(cat.slug); setCatMenuOpen(false) }}
-                  className={cn(
-                    'flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all',
-                    activeCategory === cat.slug
-                      ? 'bg-primary-500 text-white shadow-pink'
-                      : 'bg-primary-50 text-charcoal-700 hover:bg-primary-100 border border-primary-200'
-                  )}
-                >
+                <button key={cat.id} onClick={() => { pickCategory(cat.slug); setCatMenuOpen(false) }}
+                  className={cn('flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all',
+                    activeCategory === cat.slug ? 'bg-primary-500 text-white shadow-pink' : 'bg-primary-50 text-charcoal-700 hover:bg-primary-100 border border-primary-200')}>
                   <span>{CATEGORY_ICONS[cat.slug] || '📦'}</span>
                   {isAr ? (cat.name_ar || cat.name) : (cat.name_en || cat.name)}
                 </button>
@@ -241,39 +242,25 @@ export default function ProductsPage() {
           </div>
         )}
 
-        {/* ── Category filter pills ── */}
+        {/* ── Category filter pills (Fix 2: scrollable) ── */}
         <div className="relative mb-6">
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x touch-pan-x">
             {allCats.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.slug)}
-                className={cn(
-                  'flex-shrink-0 snap-start flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap',
-                  activeCategory === cat.slug
-                    ? 'bg-primary-500 text-white shadow-pink'
-                    : 'bg-white text-charcoal-700 border border-primary-200 hover:border-primary-400 hover:text-primary-600'
-                )}
-              >
+              <button key={cat.id} onClick={() => pickCategory(cat.slug)}
+                className={cn('flex-shrink-0 snap-start flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap',
+                  activeCategory === cat.slug ? 'bg-primary-500 text-white shadow-pink' : 'bg-white text-charcoal-700 border border-primary-200 hover:border-primary-400 hover:text-primary-600')}>
                 <span>{CATEGORY_ICONS[cat.slug] || '📦'}</span>
                 {isAr ? (cat.name_ar || cat.name) : (cat.name_en || cat.name)}
               </button>
             ))}
           </div>
-          <div className={cn('absolute top-0 w-8 h-full bg-gradient-to-r from-cream-100 to-transparent pointer-events-none', isAr ? 'right-0 rotate-180' : 'left-0')} />
         </div>
 
         {/* ── Results bar ── */}
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <p className="text-sm text-charcoal-600">
-            {isAr
-              ? `${displayed.length} منتج`
-              : `${displayed.length} product${displayed.length !== 1 ? 's' : ''}`}
-            {search && (
-              <span className="text-primary-500 font-medium mx-1">
-                — {isAr ? 'نتائج:' : 'results for:'} &quot;{search}&quot;
-              </span>
-            )}
+            {isAr ? `${displayed.length} منتج` : `${displayed.length} product${displayed.length !== 1 ? 's' : ''}`}
+            {search && <span className="text-primary-500 font-medium mx-1">— &quot;{search}&quot;</span>}
             {activeCategory !== 'all' && activeCatName && (
               <span className="text-charcoal-500 mx-1">
                 {isAr ? `في: ${activeCatName.name_ar || activeCatName.name}` : `in: ${activeCatName.name_en || activeCatName.name}`}
@@ -281,17 +268,15 @@ export default function ProductsPage() {
             )}
           </p>
           {(activeCategory !== 'all' || search) && (
-            <button
-              onClick={() => { setActiveCategory('all'); setSearch('') }}
-              className="flex items-center gap-1 text-xs text-primary-500 hover:underline"
-            >
+            <button onClick={() => { pickCategory('all'); setSearch('') }}
+              className="flex items-center gap-1 text-xs text-primary-500 hover:underline">
               <X className="w-3 h-3" />
               {isAr ? 'مسح الفلاتر' : 'Clear filters'}
             </button>
           )}
         </div>
 
-        {/* ── Loading skeletons ── */}
+        {/* Loading */}
         {loading && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -300,48 +285,34 @@ export default function ProductsPage() {
           </div>
         )}
 
-        {/* ── Empty state ── */}
+        {/* Empty */}
         {!loading && displayed.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
             <span className="text-6xl">🧴</span>
-            <p className="text-xl font-semibold text-charcoal-700">
-              {isAr ? 'لا توجد منتجات' : 'No products found'}
-            </p>
-            <p className="text-charcoal-600/60">
-              {isAr ? 'جرّبي تصنيفاً آخر أو ابحثي بكلمة مختلفة' : 'Try a different category or search term'}
-            </p>
-            <button
-              onClick={() => { setActiveCategory('all'); setSearch('') }}
-              className="btn-primary mt-2"
-            >
+            <p className="text-xl font-semibold text-charcoal-700">{isAr ? 'لا توجد منتجات' : 'No products found'}</p>
+            <p className="text-charcoal-600/60">{isAr ? 'جرّبي تصنيفاً آخر أو ابحثي بكلمة مختلفة' : 'Try a different category or search term'}</p>
+            <button onClick={() => { pickCategory('all'); setSearch('') }} className="btn-primary mt-2">
               {isAr ? 'عرض كل المنتجات' : 'Show All Products'}
             </button>
           </div>
         )}
 
-        {/* ── Grid view ── */}
+        {/* Grid */}
         {!loading && displayed.length > 0 && view === 'grid' && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-            {displayed.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+            {displayed.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
         )}
 
-        {/* ── List view ── */}
+        {/* List */}
         {!loading && displayed.length > 0 && view === 'list' && (
           <div className="flex flex-col gap-3">
-            {displayed.map((p) => (
-              <ProductCard key={p.id} product={p} listView />
-            ))}
+            {displayed.map((p) => <ProductCard key={p.id} product={p} listView />)}
           </div>
         )}
       </div>
 
-      {/* Close sort dropdown on outside click */}
-      {sortOpen && (
-        <div className="fixed inset-0 z-20" onClick={() => setSortOpen(false)} />
-      )}
+      {sortOpen && <div className="fixed inset-0 z-20" onClick={() => setSortOpen(false)} />}
     </div>
   )
 }
