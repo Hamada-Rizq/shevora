@@ -15,13 +15,19 @@ export type OrderSource = 'website' | 'instagram' | 'tiktok' | 'whatsapp' | 'ref
 export interface Category {
   id: string
   name: string
+  name_ar?: string
+  name_en?: string
   slug: string
   description?: string
   icon?: string
   sort_order: number
   is_active: boolean
+  parent_id?: string | null
+  link_type?: string
+  link_url?: string
   created_at: string
   updated_at: string
+  subcategories?: Category[]
 }
 
 export interface ProductImage {
