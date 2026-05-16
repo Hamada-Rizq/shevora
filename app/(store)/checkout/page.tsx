@@ -333,14 +333,14 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Free shipping indicator */}
-                {cartTotal < 500 && (
+                {cartTotal < 2500 && (
                   <div className="bg-primary-50 border border-primary-200 rounded-xl p-3 text-center">
                     <p className="text-xs text-primary-600 font-medium">
-                      🚚 أضيفي {formatPriceSimple(500 - cartTotal)} للحصول على شحن مجاني!
+                      🚚 أضيفي {formatPriceSimple(2500 - cartTotal)} للحصول على شحن مجاني!
                     </p>
                   </div>
                 )}
-                {cartTotal >= 500 && (
+                {cartTotal >= 2500 && (
                   <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-center">
                     <p className="text-xs text-green-600 font-medium">
                       🚚 مبروك! طلبك مؤهل للشحن المجاني! ✨
@@ -401,8 +401,8 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between text-sm text-charcoal-600">
                   <span>الشحن</span>
-                  <span className={cartTotal >= 500 ? 'text-green-600 font-medium' : 'text-charcoal-600'}>
-                    {cartTotal >= 500 ? 'مجاني! ✨' : 'يُحدد عبر واتساب'}
+                  <span className={cartTotal >= 2500 ? 'text-green-600 font-medium' : 'text-charcoal-600'}>
+                    {cartTotal >= 2500 ? 'مجاني! ✨' : 'يُحدد عبر واتساب'}
                   </span>
                 </div>
                 <div className="flex justify-between font-bold text-charcoal-800 text-lg border-t border-primary-100 pt-2 mt-2">

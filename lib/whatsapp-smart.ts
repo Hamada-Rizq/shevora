@@ -17,7 +17,7 @@ import { formatPriceSimple } from './utils'
 
 // ── Config ──────────────────────────────────────────────
 const WA_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '201550320776'
-const FREE_SHIPPING_THRESHOLD = 500 // EGP
+const FREE_SHIPPING_THRESHOLD = 2500 // EGP
 const BULK_DISCOUNT_THRESHOLD = 3   // items count
 
 // ── Types ───────────────────────────────────────────────
