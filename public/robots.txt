@@ -1,0 +1,14 @@
+# Shevora Cosmetics — robots.txt
+# https://shevora-app.vercel.app
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /checkout
+
+# Sitemaps
+Sitemap: https://shevora-app.vercel.app/sitemap.xml
+
+# Crawl-delay (optional, respected by some bots)
+Crawl-delay: 1

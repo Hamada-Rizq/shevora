@@ -1,0 +1,111 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://shevora-app.vercel.app/#organization",
+      "name": "Shevora",
+      "alternateName": ["Shevora Cosmetics", "Shevora Beauty", "شيفورا", "شيفورا كوزماتكس"],
+      "url": "https://shevora-app.vercel.app",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://shevora-app.vercel.app/logo.png",
+        "width": 512,
+        "height": 512
+      },
+      "description": "Shevora — Your destination for premium beauty and skincare products in Egypt. Shop skincare, haircare, makeup, and body care online.",
+      "sameAs": [
+        "https://www.instagram.com/cosmeticano1",
+        "https://www.tiktok.com/@cosmeticano1",
+        "https://wa.me/201550320776"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+201550320776",
+        "contactType": "customer service",
+        "availableLanguage": ["Arabic", "English"],
+        "areaServed": "EG"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "EG"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://shevora-app.vercel.app/#website",
+      "url": "https://shevora-app.vercel.app",
+      "name": "Shevora — Beauty & Glow",
+      "alternateName": "شيفورا — جمال وإشراق",
+      "description": "Shop premium cosmetics and beauty products online in Egypt. Skincare, haircare, makeup, body care — with WhatsApp ordering.",
+      "publisher": {
+        "@id": "https://shevora-app.vercel.app/#organization"
+      },
+      "inLanguage": ["ar", "en"],
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://shevora-app.vercel.app/products?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://shevora-app.vercel.app/#homepage",
+      "url": "https://shevora-app.vercel.app",
+      "name": "Shevora — Beauty & Glow | Premium Cosmetics in Egypt",
+      "description": "Shop premium skincare, haircare, makeup, and body care products online. Order via WhatsApp. Fast delivery across Egypt.",
+      "isPartOf": {
+        "@id": "https://shevora-app.vercel.app/#website"
+      },
+      "about": {
+        "@id": "https://shevora-app.vercel.app/#organization"
+      },
+      "inLanguage": ["ar", "en"]
+    },
+    {
+      "@type": "CollectionPage",
+      "@id": "https://shevora-app.vercel.app/products#collection",
+      "url": "https://shevora-app.vercel.app/products",
+      "name": "All Products — Shevora Cosmetics",
+      "description": "Browse all beauty and cosmetics products. Skincare, haircare, makeup, body care, tools, and bundles.",
+      "isPartOf": {
+        "@id": "https://shevora-app.vercel.app/#website"
+      },
+      "inLanguage": ["ar", "en"]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://shevora-app.vercel.app/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://shevora-app.vercel.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Products",
+          "item": "https://shevora-app.vercel.app/products"
+        }
+      ]
+    },
+    {
+      "@type": "ItemList",
+      "name": "Product Categories",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Skincare", "url": "https://shevora-app.vercel.app/products?category=skincare" },
+        { "@type": "ListItem", "position": 2, "name": "Haircare", "url": "https://shevora-app.vercel.app/products?category=haircare" },
+        { "@type": "ListItem", "position": 3, "name": "Body Care", "url": "https://shevora-app.vercel.app/products?category=body-care" },
+        { "@type": "ListItem", "position": 4, "name": "Makeup", "url": "https://shevora-app.vercel.app/products?category=makeup" },
+        { "@type": "ListItem", "position": 5, "name": "Tools", "url": "https://shevora-app.vercel.app/products?category=tools" },
+        { "@type": "ListItem", "position": 6, "name": "Bundles", "url": "https://shevora-app.vercel.app/products?category=bundles" },
+        { "@type": "ListItem", "position": 7, "name": "Hot Offers", "url": "https://shevora-app.vercel.app/products?category=hot-offers" },
+        { "@type": "ListItem", "position": 8, "name": "Kids", "url": "https://shevora-app.vercel.app/products?category=kids" },
+        { "@type": "ListItem", "position": 9, "name": "Men Care", "url": "https://shevora-app.vercel.app/products?category=men-care" },
+        { "@type": "ListItem", "position": 10, "name": "Mixed Sets", "url": "https://shevora-app.vercel.app/products?category=mixed-sets" }
+      ]
+    }
+  ]
+}

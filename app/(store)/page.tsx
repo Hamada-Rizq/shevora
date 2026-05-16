@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase-server'
@@ -6,6 +7,25 @@ import ProductCard from '@/components/store/ProductCard'
 import CollectionsSection from '@/components/store/CollectionsSection'
 import { PublicProduct } from '@/lib/types'
 import { ArrowLeft, Sparkles, TrendingUp, Gift } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Shevora — Beauty & Glow | Premium Cosmetics in Egypt',
+  description:
+    'Shevora — Your beauty destination in Egypt. Shop skincare, haircare, makeup, body care & bundles online. Fast WhatsApp ordering. شيفورا — متجرك للجمال والعناية بالبشرة.',
+  keywords: [
+    'Shevora', 'Shevora cosmetics', 'beauty store Egypt',
+    'cosmetics online Egypt', 'skincare haircare makeup',
+    'شيفورا', 'متجر تجميل مصر', 'مستحضرات تجميل اونلاين',
+  ],
+  openGraph: {
+    title: 'Shevora — Beauty & Glow | Premium Cosmetics',
+    description: 'Shop premium beauty products online. Fast delivery across Egypt.',
+    url: 'https://shevora-app.vercel.app',
+  },
+  alternates: {
+    canonical: 'https://shevora-app.vercel.app',
+  },
+}
 
 async function getFeaturedProducts(): Promise<PublicProduct[]> {
   const supabase = await createClient()
